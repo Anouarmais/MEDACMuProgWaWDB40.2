@@ -4,10 +4,12 @@
  */
 package batallas;
 
+import DB40.BaseDatos40;
 import componentes.Componentes;
 import componentes.animales.Elefante;
 import componentes.animales.Tigre;
 import componentes.personas.Caballeria;
+import componentes.personas.Condecorados;
 import componentes.personas.General;
 import componentes.personas.Infanteria;
 import excepciones.animales.MaxAnimalesException;
@@ -20,6 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import static DB40.BaseDatos40.cerrarConeccion;
+import static DB40.BaseDatos40.realizarConsulta;
+
 /**
  * <p>Clase que representa un ejército.</p>
  *
@@ -28,6 +33,9 @@ import java.util.Scanner;
  * @version 1.0
  */
 public class Ejercito {
+    BaseDatos40 sacardatos =new BaseDatos40();
+    static Condecorados busquedaGeneral = new Condecorados(null , null ,null ,"HEROIC" ,"LEGION OF MERIT (WITH COMBAT V)");
+    static Condecorados busquedaGeneralmedal = new Condecorados(null , null ,null ,null ,"MEDAL OF HONOR");
 
     private static final int MAX_PESO = 50;
     private static final int MAX_ANIMALES = 3;
@@ -143,7 +151,14 @@ public class Ejercito {
 
                     break;
                 case "d":
-                    try {
+                   try{realizarConsulta(busquedaGeneral);}catch ( Exception e ){
+                        System.out.println();
+                    }
+                    try{realizarConsulta(busquedaGeneralmedal);}catch ( Exception e ){
+                        System.out.println();
+                    }
+                    cerrarConeccion();
+                   /* try {
                         if (((saldoPeso + General.PESO_GENERAL) < MAX_PESO) && !hayGeneral) {
                             adicionarUnidad(new General());
                             imprimirInfo(unidades.getLast());
@@ -156,10 +171,11 @@ public class Ejercito {
                         }
                     } catch (MaxCapPesoEjercitoException | MaxCapGeneralException e) {
                         System.out.println(e.getMessage());
-                    }
+                    }*/
 
                     break;
                 case "e":
+
                     try {
                         if (((saldoPeso + Elefante.PESO_ELEFANTE) < MAX_PESO) && contadorAnimales < MAX_ANIMALES) {
                             adicionarUnidad(new Elefante());
