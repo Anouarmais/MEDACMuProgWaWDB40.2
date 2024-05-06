@@ -50,7 +50,12 @@ public class Ejercito {
     private int saldoPeso;
     private String nombre;
 
+    static List<General> listaGenerales ;
+
+
+
     public Ejercito() {
+
 
         nombre = "";
         saldoPeso = 0;
@@ -78,6 +83,8 @@ public class Ejercito {
         return saldoPeso;
     }
 
+
+
     private void menu() {
         Scanner scanner = new Scanner(System.in);
         String opcion;
@@ -85,6 +92,8 @@ public class Ejercito {
         String[] opciones = {"Crear ID para ejército", "Añadir infantería",
                 "Añadir caballería", "Añadir general", "Añadir elefante", "Añadir tigre",
                 "Consultar saldo ejército", "Eliminar unidad", "Salir y confirmar"};
+
+
 
         do {
 
@@ -151,29 +160,67 @@ public class Ejercito {
 
                     break;
                 case "d":
-                   try{realizarConsulta(busquedaGeneral);}catch ( Exception e ){
-                        System.out.println();
-                    }
-                    try{realizarConsulta(busquedaGeneralmedal);}catch ( Exception e ){
-                        System.out.println();
-                    }
-                    cerrarConeccion();
-                   /* try {
-                        if (((saldoPeso + General.PESO_GENERAL) < MAX_PESO) && !hayGeneral) {
-                            adicionarUnidad(new General());
-                            imprimirInfo(unidades.getLast());
-                        } else {
-                            if (saldoPeso == MAX_PESO) {
-                                throw new MaxCapPesoEjercitoException(Message.MAX_CAP_PESO_EJERCITO);
-                            } else {
-                                throw new MaxCapGeneralException(Message.GENERAL_EXISTENTE);
-                            }
-                        }
-                    } catch (MaxCapPesoEjercitoException | MaxCapGeneralException e) {
-                        System.out.println(e.getMessage());
-                    }*/
 
+                    if (hayGeneral) {
+                        System.out.println("Ya hay un general en el ejército. No se puede añadir otro.");
+                    } else {
+                        listaGenerales = new ArrayList<>();
+
+                        try {
+                            List<General> generals1 = realizarConsulta(busquedaGeneral);
+                            listaGenerales.addAll(generals1);
+                        } catch (Exception e) {
+                            System.out.println("Error al consultar generales por HEROIC LEGION OF MERIT (WITH COMBAT V): " + e.getMessage());
+                        }
+
+                        try {
+                            List<General> generals2 = realizarConsulta(busquedaGeneralmedal);
+                            listaGenerales.addAll(generals2);
+                        } catch (Exception e) {
+                            System.out.println("Error al consultar generales por MEDAL OF HONOR: " + e.getMessage());
+
+                        }
+
+
+                        int enumeracion = 1;
+                        for (General generales : listaGenerales) {
+                            System.out.println(enumeracion + ". " + generales);
+                            enumeracion++;
+                        }
+
+                        System.out.println("Elija un general de la lista:");
+                        int opcionGeneral = Integer.parseInt(scanner.nextLine());
+
+                        if (opcionGeneral > 0 && opcionGeneral <= listaGenerales.size()) {
+                            General generalElegido = listaGenerales.get(opcionGeneral - 1);
+
+                            try {
+                                if (((saldoPeso + General.PESO_GENERAL) < MAX_PESO) && !hayGeneral) {
+                                    adicionarUnidad(generalElegido);
+                                    imprimirInfo(unidades.getLast());
+                                } else {
+                                    if (saldoPeso == MAX_PESO) {
+                                        throw new MaxCapPesoEjercitoException(Message.MAX_CAP_PESO_EJERCITO);
+                                    } else {
+                                        throw new MaxCapGeneralException(Message.GENERAL_EXISTENTE);
+                                    }
+                                }
+                            } catch (MaxCapPesoEjercitoException | MaxCapGeneralException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        } else {
+                            System.out.println("Opción inválida. Intente nuevamente.");
+                        }
+
+
+                        hayGeneral = true;
+                    }
+
+                    cerrarConeccion();
                     break;
+
+
+
                 case "e":
 
                     try {

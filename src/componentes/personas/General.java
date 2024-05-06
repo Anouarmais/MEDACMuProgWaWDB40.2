@@ -30,12 +30,8 @@ public static final int PESO_GENERAL = 1;
        
     @Override
 public String toString() {
-        return "General {" +
-                "Nombre='" + this.getNombre() + '\'' +
-                ", Ataque='" + this.getAtaque() + '\'' +
-                ", Defensa='" + this.getDefensa() + '\'' +
-                ", Salud='" + this.getSalud() + '\'' +                
-                ", Peso='" + this.getPeso() + '\'' +
-                '}';
+        return "El mitiquísimo " + this.getNombre() + " con un ataque de " + this.getAtaque()  +
+                ", con una defensa de " + this.getDefensa()  +
+                ", y por ultimo una salud de " + this.getSalud() ;
     }     
 }

@@ -5,7 +5,10 @@ import com.db4o.ObjectSet;
 import com.db4o.ext.DatabaseClosedException;
 import com.db4o.ext.DatabaseReadOnlyException;
 import componentes.personas.Condecorados;
+import componentes.personas.General;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class BaseDatos40 {
@@ -64,24 +67,29 @@ public class BaseDatos40 {
             throw new RuntimeException(e);
         }
     }
+    public static List <General> generalesquery = new ArrayList<>();
+    public static List<General> realizarConsulta(Condecorados conde) {
+        List<General> generalesquery = new ArrayList<>(); // Lista local para almacenar los generales de esta consulta
 
-    public static void realizarConsulta(Condecorados conde) {
+        try {
+            ObjectSet<Condecorados> condes = HeroesyGenerales.queryByExample(conde);
 
-        try{
+            while (condes.hasNext()) {
+                Condecorados condecorado = condes.next();
+                General general = new General();
+                general.setNombre(condecorado.getFirstName() + " " + condecorado.getLastName());
 
-            ObjectSet condes = HeroesyGenerales.queryByExample(conde);
-            while (condes.hasNext() ){
-                // Pelicula pelimod = (Pe    licula) pelis.next();
-                //  pelimod.setNombre("cacacola");
-                //bd.store(pelimod);
-                System.out.println(condes.next());
-                //   Pelicula borrada = (Pelicula) pelis.next();
-                //    bd.delete(borrada);
+                // System.out.println(general);
+
+                generalesquery.add(general); // Agregar el general a la lista local
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        return generalesquery; // Devolver la lista local
     }
+
+
 }
 
