@@ -25,7 +25,7 @@ public static final int PESO_GENERAL = 1;
         setAtaque((int) Math.ceil(atributos.get(0)*getMultiplicador()));
         setDefensa((int) Math.ceil(atributos.get(1)*getMultiplicador()));
         setSalud((int) Math.ceil(atributos.get(2)*getMultiplicador()));
-//        setNombre();
+
     }
        
     @Override

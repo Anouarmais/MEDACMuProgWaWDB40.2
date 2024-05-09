@@ -13,7 +13,7 @@ import componentes.personas.Condecorados;
 
 import java.util.List;
 
-import static DB40.BaseDatos40.cerrarConeccion;
+import static DB40.BaseDatos40.*;
 
 /**
  * @author danie
@@ -24,26 +24,22 @@ public class MEDAC_ProgramacionBatalla {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        VolcarInfo s = new VolcarInfo();
+        BaseDatos40 ss = new BaseDatos40("HeroesYGenerales");
+   //     ss.verBaseDeDatos();
+ if (ss.baseDeDatosVacia()) {
 
-  //    VolcarInfo ss = new VolcarInfo();
-//        String test = ExploradorFicheros.leerFichero();
- Batalla batalla = new Batalla();
-//    VolcarInfo d = new VolcarInfo();
-   // BaseDatos40 s = new BaseDatos40();
-     //    List<Condecorados>condecoradosList = d.leerArchivo();
-    /// s.Cargarcondyheroes(condecoradosList);
-//       // s.borrarBBDD();
-//s.verBBDD();
-    //    cerrarConeccion();
-       // d.leerArchivo();
+            List<Condecorados> condecoradosList = s.leerArchivo();
+            ss.cargarCondecorados(condecoradosList);
+            ss.realizarConsultaGeneral();
+            ss.realizarConsulta();
+        }
 
-    /*   for(Condecorados condecorados : condecoradosList){
-            System.out.println(condecorados);
-        }*/
-     //  s.Cargarcondyheroes(condecoradosList);
-    //  s.verBBDD();
-     //   s.cerrarConeccion();
+        Batalla batalla = new Batalla();
+     //   ss.verBaseDeDatos();
+      cerrarConexion();
     }
+
 }
     
 

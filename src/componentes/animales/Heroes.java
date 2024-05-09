@@ -9,11 +9,11 @@ import java.util.Random;
  * @author danie
  */
 public class Heroes extends Animal{
-    public static final int PESO_HEROE = 10;
+    public static final int PESO_HEROE = 5;
     public Heroes(){
         super();
         setMultiplicador(2f);
-        setPeso(10);
+        setPeso(5);
 
         List<Integer> atributos = generarAtributos(150);
         setAtaque((int) Math.ceil(atributos.get(0)*getMultiplicador()));
