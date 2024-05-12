@@ -5,7 +5,6 @@
 package batallas;
 
 import DB40.BaseDatos40;
-import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.ext.DatabaseClosedException;
 import com.db4o.ext.DatabaseReadOnlyException;
@@ -15,7 +14,6 @@ import componentes.animales.Elefante;
 import componentes.animales.Heroes;
 import componentes.animales.Tigre;
 import componentes.personas.Caballeria;
-import componentes.personas.Condecorados;
 import componentes.personas.General;
 import componentes.personas.Infanteria;
 import excepciones.animales.MaxAnimalesException;
@@ -28,7 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-import static DB40.BaseDatos40.HeroesyGenerales;
+import static DB40.BaseDatos40.*;
 
 //import static DB40.BaseDatos40.cerrarConeccion;
 //import static DB40.BaseDatos40.realizarConsulta;
@@ -93,7 +91,7 @@ public class Ejercito {
 
         String[] opciones = {"Crear ID para ejército", "Añadir infantería",
                 "Añadir caballería", "Añadir general", "Añadir Heroes",
-                "Consultar saldo ejército", "Eliminar unidad", "Salir y confirmar"};
+                "Consultar saldo ejército", "Eliminar unidad", "Confirmar ejercito", "Top socre", "Salir del juego"};
 
 
         do {
@@ -202,7 +200,6 @@ public class Ejercito {
                     break;
 
 
-
                 case "e":
                     try {
                         if (contadorAnimales == 3) {
@@ -256,170 +253,178 @@ public class Ejercito {
 
 
                 case "f":
-                            System.out.println(Message.SALDO_ACTUAL + getSaldoPeso());
-                            break;
-                        case "g":
-                            try {
-                                if (!unidades.isEmpty()) {
-                                    System.out.println("Eliminar unidad del ejército: ");
-                                    informacionEjercito();
+                    System.out.println(Message.SALDO_ACTUAL + getSaldoPeso());
+                    break;
+                case "g":
+                    try {
+                        if (!unidades.isEmpty()) {
+                            System.out.println("Eliminar unidad del ejército: ");
+                            informacionEjercito();
 
-                                    System.out.println("Nombre de la unidad a eliminar: ");
-                                    String nombreUnidad = scanner.nextLine();
+                            System.out.println("Nombre de la unidad a eliminar: ");
+                            String nombreUnidad = scanner.nextLine();
 
-                                    eliminarUnidad(nombreUnidad);
-                                } else {
-                                    throw new EjercitoVacioException(Message.EJERCITO_VACIO);
-                                }
-                            } catch (EjercitoVacioException e) {
-                                System.out.println(e.getMessage());
-                            }
-
-                            break;
-                        case "h":
-                            try {
-                                if (saldoPeso >= MIN_UNIDADES && hayGeneral) {
-                                    System.out.println(System.lineSeparator() + "Su Ejército está formado por: "
-                                            + System.lineSeparator());
-
-                                    informacionEjercito();
-
-                                    actualizarEjercito();
-                                    break;
-                                }
-
-                                if (nombre == null || nombre.isEmpty() || nombre.isBlank()) {
-                                    throw new EjercitoNombreException(Message.EJERCITO_SIN_NOMBRE);
-                                }
-
-                                if (saldoPeso < MIN_UNIDADES) {
-                                    throw new UnidadMinimaException(Message.UNIDADES_MINIMAS);
-                                } else {
-                                    throw new GeneralMinimoException(Message.GENERAL_MINIMO);
-                                }
-                            } catch (EjercitoNombreException | UnidadMinimaException | GeneralMinimoException e) {
-                                System.out.println(e.getMessage());
-                            }
-
-                            menu();
-
-                            break;
-                        default:
-                            System.out.println(Message.OPCION_INAVLIDA);
-                            break;
+                            eliminarUnidad(nombreUnidad);
+                        } else {
+                            throw new EjercitoVacioException(Message.EJERCITO_VACIO);
+                        }
+                    } catch (EjercitoVacioException e) {
+                        System.out.println(e.getMessage());
                     }
-            } while (!opcion.equals("h")) ;
-        }
 
-        private void imprimirInfo (Componentes componente){
-            System.out.println(Message.ADICIONAR_COMPONENTE + System.lineSeparator() + componente);
-            System.out.println(System.lineSeparator() + Message.SALDO_ACTUAL + getSaldoPeso());
-        }
+                    break;
+                case "h":
+                    try {
+                        if (saldoPeso >= MIN_UNIDADES && hayGeneral) {
+                            System.out.println(System.lineSeparator() + "Su Ejército está formado por: "
+                                    + System.lineSeparator());
 
-        public void recibirDano ( int dano){
-            Iterator<Componentes> iterador = unidades.iterator();
+                            informacionEjercito();
 
-            while (dano > 0 && iterador.hasNext()) {
-                Componentes componente = iterador.next();
-                componente.recibirDano(dano);
-
-                if (componente.getSalud() < 0) {
-
-                    dano = Math.abs(componente.getSalud());
-                    iterador.remove();
-                    unidades.remove(componente);
-
-                    System.out.println("El componente " + componente.getNombre() + " ha sido eliminado del ejército " +
-                            nombre + " por falta de salud");
-                }
-
-                restablecerAtributos();
-                actualizarEjercito();
-            }
-        }
-
-        private void actualizarEjercito () {
-            for (Componentes componente : unidades) {
-                ataque += componente.getAtaque();
-                defensa += componente.getDefensa();
-                salud += componente.getSalud();
-            }
-        }
-
-        private void restablecerAtributos () {
-            ataque = 0;
-            defensa = 0;
-            salud = 0;
-        }
-
-        private void adicionarUnidad (Componentes componentes){
-            if (componentes instanceof Infanteria || componentes instanceof Caballeria) {
-                unidades.add(componentes);
-                saldoPeso += componentes.getPeso();
-            } else if (componentes instanceof General) {
-                unidades.add(componentes);
-                saldoPeso += componentes.getPeso();
-                hayGeneral = true;
-            } else if (componentes instanceof Elefante || componentes instanceof Tigre || componentes instanceof Heroes) {
-                unidades.add(componentes);
-                saldoPeso += componentes.getPeso();
-                contadorAnimales++;
-            }
-        }
-
-        private void eliminarUnidad (String nombreUnidad){
-
-            try {
-                for (Componentes unidad : unidades) {
-                    if (unidad.getNombre().equalsIgnoreCase(nombreUnidad)) {
-                        if (unidad instanceof General) {
-                            hayGeneral = false;
-                        } else if (unidad instanceof Elefante || unidad instanceof Tigre) {
-                            contadorAnimales--;
+                            actualizarEjercito();
+                            break;
                         }
 
-                        unidades.remove(unidad);
-                        saldoPeso -= unidad.getPeso();
+                        if (nombre == null || nombre.isEmpty() || nombre.isBlank()) {
+                            throw new EjercitoNombreException(Message.EJERCITO_SIN_NOMBRE);
+                        }
 
-                        System.out.println(unidad.getNombre() + ": " + Message.UNIDAD_ELIM_SATIS);
-
-                        break;
-                    } else {
-                        throw new UnidadInexistenteException(Message.UNIDAD_INEXISTENTE);
+                        if (saldoPeso < MIN_UNIDADES) {
+                            throw new UnidadMinimaException(Message.UNIDADES_MINIMAS);
+                        } else {
+                            throw new GeneralMinimoException(Message.GENERAL_MINIMO);
+                        }
+                    } catch (EjercitoNombreException | UnidadMinimaException | GeneralMinimoException e) {
+                        System.out.println(e.getMessage());
                     }
-                }
-            } catch (UnidadInexistenteException e) {
-                System.out.println(e.getMessage());
-            }
-        }
 
-        private void informacionEjercito () {
+                    menu();
+
+                    break;
+                case "i":
+                    vergeneralganador();
+                    break;
+                case "j" :
+                    cerrarConexion();
+                    System.exit(1);
+                    break;
+                default:
+                    System.out.println(Message.OPCION_INAVLIDA);
+                    break;
+            }
+        } while (!opcion.equals("h"));
+    }
+
+    private void imprimirInfo(Componentes componente) {
+        System.out.println(Message.ADICIONAR_COMPONENTE + System.lineSeparator() + componente);
+        System.out.println(System.lineSeparator() + Message.SALDO_ACTUAL + getSaldoPeso());
+    }
+
+    public void recibirDano(int dano) {
+        Iterator<Componentes> iterador = unidades.iterator();
+
+        while (dano > 0 && iterador.hasNext()) {
+            Componentes componente = iterador.next();
+            componente.recibirDano(dano);
+
+            if (componente.getSalud() < 0) {
+
+                dano = Math.abs(componente.getSalud());
+                iterador.remove();
+                unidades.remove(componente);
+
+                System.out.println("El componente " + componente.getNombre() + " ha sido eliminado del ejército " +
+                        nombre + " por falta de salud");
+            }
+
+            restablecerAtributos();
+            actualizarEjercito();
+        }
+    }
+
+    private void actualizarEjercito() {
+        for (Componentes componente : unidades) {
+            ataque += componente.getAtaque();
+            defensa += componente.getDefensa();
+            salud += componente.getSalud();
+        }
+    }
+
+    private void restablecerAtributos() {
+        ataque = 0;
+        defensa = 0;
+        salud = 0;
+    }
+
+    private void adicionarUnidad(Componentes componentes) {
+        if (componentes instanceof Infanteria || componentes instanceof Caballeria) {
+            unidades.add(componentes);
+            saldoPeso += componentes.getPeso();
+        } else if (componentes instanceof General) {
+            unidades.add(componentes);
+            saldoPeso += componentes.getPeso();
+            hayGeneral = true;
+        } else if (componentes instanceof Elefante || componentes instanceof Tigre || componentes instanceof Heroes) {
+            unidades.add(componentes);
+            saldoPeso += componentes.getPeso();
+            contadorAnimales++;
+        }
+    }
+
+    private void eliminarUnidad(String nombreUnidad) {
+
+        try {
             for (Componentes unidad : unidades) {
-                System.out.println(unidad);
-            }
-        }
+                if (unidad.getNombre().equalsIgnoreCase(nombreUnidad)) {
+                    if (unidad instanceof General) {
+                        hayGeneral = false;
+                    } else if (unidad instanceof Elefante || unidad instanceof Tigre) {
+                        contadorAnimales--;
+                    }
 
-        private void asignarNombre (String nombre){
-            try {
-                if (!nombres.contains(nombre)) {
-                    nombres.add(nombre);
-                    this.nombre = nombre;
+                    unidades.remove(unidad);
+                    saldoPeso -= unidad.getPeso();
+
+                    System.out.println(unidad.getNombre() + ": " + Message.UNIDAD_ELIM_SATIS);
+
+                    break;
                 } else {
-                    throw new NombreExistenteException(Message.NOMBRE_EXISTENTE);
+                    throw new UnidadInexistenteException(Message.UNIDAD_INEXISTENTE);
                 }
-            } catch (NombreExistenteException e) {
-                System.out.println(e.getMessage());
             }
+        } catch (UnidadInexistenteException e) {
+            System.out.println(e.getMessage());
         }
+    }
 
-        public General obtenerGeneralGanador () {
-            for (Componentes unidad : unidades) {
-                if (unidad instanceof General) {
-                    return (General) unidad;
-                }
-            }
-            return null;
+    private void informacionEjercito() {
+        for (Componentes unidad : unidades) {
+            System.out.println(unidad);
         }
+    }
+
+    private void asignarNombre(String nombre) {
+        try {
+            if (!nombres.contains(nombre)) {
+                nombres.add(nombre);
+                this.nombre = nombre;
+            } else {
+                throw new NombreExistenteException(Message.NOMBRE_EXISTENTE);
+            }
+        } catch (NombreExistenteException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public General obtenerGeneralGanador() {
+        for (Componentes unidad : unidades) {
+            if (unidad instanceof General) {
+                return (General) unidad;
+            }
+        }
+        return null;
+    }
+
     private void inicializarGeneralesDisponibles() {
         // Realizar consulta a la base de datos para obtener los generales disponibles
         Query consulta = HeroesyGenerales.query();
@@ -431,4 +436,4 @@ public class Ejercito {
         }
     }
 
-    }
+}

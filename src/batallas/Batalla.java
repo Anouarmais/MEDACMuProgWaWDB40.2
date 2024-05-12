@@ -4,8 +4,14 @@
  */
 package batallas;
 
+import DB40.BaseDatos40;
+import componentes.personas.General;
+import componentes.personas.GeneralTOPSCORE;
+
 import java.util.ArrayList;
 import java.util.Random;
+
+import static DB40.BaseDatos40.guardarGenganador;
 
 /**
  * <p>Clase que representa una batalla entre dos ejércitos.</p>
@@ -57,12 +63,27 @@ public class Batalla {
                 }
 
                 if (chequearGanador()) {
+                    Ejercito ganador = getGanador();
+                    General genganador = ganador.obtenerGeneralGanador();
                     if (getGanador() == ejercito1) {
                         System.out.println(System.lineSeparator() + Message.EJERCITO_GANADOR +
                                 ejercito1.getNombre());
+                        GeneralTOPSCORE ganadortop= new GeneralTOPSCORE();
+                        ganadortop.setAtaque(genganador.getAtaque());
+                        ganadortop.setNombre(genganador.getNombre());
+                        ganadortop.setDefensa(genganador.getDefensa());
+                        ganadortop.setSalud(genganador.getSalud());
+                        guardarGenganador(ganadortop);
+
                     } else {
                         System.out.println(System.lineSeparator() + Message.EJERCITO_GANADOR +
                                 ejercito2.getNombre());
+                        GeneralTOPSCORE ganadortop2= new GeneralTOPSCORE();
+                        ganadortop2.setAtaque(genganador.getAtaque());
+                        ganadortop2.setNombre(genganador.getNombre());
+                        ganadortop2.setDefensa(genganador.getDefensa());
+                        ganadortop2.setSalud(genganador.getSalud());
+                        guardarGenganador(ganadortop2);
                     }
 
                     break;
@@ -94,4 +115,5 @@ public class Batalla {
     public Ejercito getGanador() {
         return ganador;
     }
+
 }

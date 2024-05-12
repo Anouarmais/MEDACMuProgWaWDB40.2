@@ -7,13 +7,11 @@ package medac_programacionbatalla;
 import DB40.BaseDatos40;
 import DB40.VolcarInfo;
 import batallas.Batalla;
-import com.db4o.Db4oEmbedded;
-import com.db4o.ObjectContainer;
 import componentes.personas.Condecorados;
 
 import java.util.List;
 
-import static DB40.BaseDatos40.*;
+import static DB40.BaseDatos40.cerrarConexion;
 
 /**
  * @author danie
@@ -26,8 +24,17 @@ public class MEDAC_ProgramacionBatalla {
     public static void main(String[] args) {
         VolcarInfo s = new VolcarInfo();
         BaseDatos40 ss = new BaseDatos40("HeroesYGenerales");
-   //     ss.verBaseDeDatos();
- if (ss.baseDeDatosVacia()) {
+        /*
+         Si quieres borrar la BBDD
+         ss.borrarBaseDeDatos();
+        */
+
+         /*
+         Si quieres ver la BBDD
+        ss.verBaseDeDatos();
+        */
+
+        if (ss.baseDeDatosVacia()) {
 
             List<Condecorados> condecoradosList = s.leerArchivo();
             ss.cargarCondecorados(condecoradosList);
@@ -36,8 +43,7 @@ public class MEDAC_ProgramacionBatalla {
         }
 
         Batalla batalla = new Batalla();
-     //   ss.verBaseDeDatos();
-      cerrarConexion();
+        cerrarConexion();
     }
 
 }

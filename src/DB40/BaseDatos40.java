@@ -11,6 +11,7 @@ import com.db4o.query.Query;
 import componentes.animales.Heroes;
 import componentes.personas.Condecorados;
 import componentes.personas.General;
+import componentes.personas.GeneralTOPSCORE;
 
 import java.util.List;
 
@@ -20,6 +21,10 @@ public class BaseDatos40 {
 
     public BaseDatos40(String nombreArchivo) {
         this.HeroesyGenerales = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), nombreArchivo);
+    }
+
+    public static void guardarGenganador(GeneralTOPSCORE genganador) {
+        HeroesyGenerales.store(genganador);
     }
 
     public static void cerrarConexion() {
@@ -47,6 +52,15 @@ public class BaseDatos40 {
             throw new RuntimeException(e);
         }
         try {
+            ObjectSet<GeneralTOPSCORE> resultados = HeroesyGenerales.query(GeneralTOPSCORE.class);
+            while (resultados.hasNext()) {
+                GeneralTOPSCORE genetop = resultados.next();
+                HeroesyGenerales.delete(genetop);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
             ObjectSet<General> resultados = HeroesyGenerales.query(General.class);
             while (resultados.hasNext()) {
                 General general = resultados.next();
@@ -66,8 +80,8 @@ public class BaseDatos40 {
         }
     }
 
-    public void verBaseDeDatos() {
-       try {
+    public  void verBaseDeDatos() {
+        try {
             ObjectSet<Condecorados> resultados = HeroesyGenerales.queryByExample(new Condecorados(null, null, null, null, null));
             while (resultados.hasNext()) {
                 System.out.println(resultados.next());
@@ -75,30 +89,62 @@ public class BaseDatos40 {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-       try{
-        Query consulta = HeroesyGenerales.query();
-        consulta.constrain(General.class);
-        consulta.descend("nombre");
-        ObjectSet<General> res = consulta.execute();
-        while (res.hasNext()) {
-            System.out.println(res.next());
-        }}catch (Exception e) {
-           throw new RuntimeException(e);
-       }
-        try{
+        try {
             Query consulta = HeroesyGenerales.query();
-            consulta.constrain(Heroes.class);
+            consulta.constrain(General.class);
             consulta.descend("nombre");
             ObjectSet<General> res = consulta.execute();
             while (res.hasNext()) {
                 System.out.println(res.next());
-            }}catch (Exception e) {
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            Query consulta = HeroesyGenerales.query();
+            consulta.constrain(Heroes.class);
+            consulta.descend("nombre");
+            ObjectSet<Heroes> res = consulta.execute();
+            while (res.hasNext()) {
+                System.out.println(res.next());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Query consulta = HeroesyGenerales.query();
+            consulta.constrain(GeneralTOPSCORE.class);
+            consulta.descend("salud").orderAscending();
+            ObjectSet<GeneralTOPSCORE> res = consulta.execute();
+            while (res.hasNext()) {
+                System.out.println(res.next());
+            }
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+    public static   void vergeneralganador(){
+        try {
+            Query consulta = HeroesyGenerales.query();
+            consulta.constrain(GeneralTOPSCORE.class);
+            consulta.descend("salud").orderDescending();
+            ObjectSet<GeneralTOPSCORE> res = consulta.execute();
+            if(res.isEmpty() ){
+                System.out.println("No has jugado ninguna partida");
+            }
+            while (res.hasNext()) {
+                System.out.println(res.next());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean baseDeDatosVacia() {
         return HeroesyGenerales.queryByExample(Condecorados.class).isEmpty();
     }
+
     public void realizarConsulta() {
         Query consulta1 = HeroesyGenerales.query();
         consulta1.constrain(Condecorados.class);
@@ -113,6 +159,7 @@ public class BaseDatos40 {
 
         }
     }
+
 
     public void realizarConsultaGeneral() {
         try {

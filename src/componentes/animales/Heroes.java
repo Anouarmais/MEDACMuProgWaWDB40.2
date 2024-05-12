@@ -23,12 +23,7 @@ public class Heroes extends Animal{
 
     @Override
     public String toString() {
-        return "Heroe {" +
-                "Nombre='" + this.getNombre() + '\'' +
-                ", Ataque='" + this.getAtaque() + '\'' +
-                ", Defensa='" + this.getDefensa() + '\'' +
-                ", Salud='" + this.getSalud() + '\'' +
-                ", Peso='" + this.getPeso() + '\'' +
-                '}';
+        return "El legendario " + this.getNombre() +" con una solida defensa de " + this.getDefensa() + ", una increible resistencia de " +this.getSalud()
+                + " y un daño abismal de " + this.getAtaque();
     }
 }
