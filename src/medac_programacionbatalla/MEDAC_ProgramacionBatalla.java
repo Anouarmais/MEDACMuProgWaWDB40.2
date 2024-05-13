@@ -24,15 +24,15 @@ public class MEDAC_ProgramacionBatalla {
     public static void main(String[] args) {
         VolcarInfo s = new VolcarInfo();
         BaseDatos40 ss = new BaseDatos40("HeroesYGenerales");
-        /*
-         Si quieres borrar la BBDD
-         ss.borrarBaseDeDatos();
-        */
 
-         /*
-         Si quieres ver la BBDD
-        ss.verBaseDeDatos();
-        */
+         //Si quieres borrar la BBDD
+        //ss.borrarBaseDeDatos();
+
+
+
+       //  Si quieres ver la BBDD
+
+      //  ss.verBaseDeDatos();
 
         if (ss.baseDeDatosVacia()) {
 
@@ -41,8 +41,8 @@ public class MEDAC_ProgramacionBatalla {
             ss.realizarConsultaGeneral();
             ss.realizarConsulta();
         }
-
-        Batalla batalla = new Batalla();
+//ss.verBaseDeDatos();
+       Batalla batalla = new Batalla();
         cerrarConexion();
     }
 

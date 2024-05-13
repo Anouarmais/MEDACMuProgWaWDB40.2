@@ -4,7 +4,6 @@
  */
 package batallas;
 
-import DB40.BaseDatos40;
 import com.db4o.ObjectSet;
 import com.db4o.ext.DatabaseClosedException;
 import com.db4o.ext.DatabaseReadOnlyException;
@@ -42,9 +41,10 @@ public class Ejercito {
 
     private static final int MAX_PESO = 50;
     private static final int MAX_ANIMALES = 3;
-    private List<General> generalesDisponibles = new ArrayList<>();
     private static final int MIN_UNIDADES = 2;
     private static final List<String> nombres = new ArrayList<>();
+    private static final List<General> generalesDisponibles = new ArrayList<>();
+    private static final List<Heroes> heroes = new ArrayList<>();
     private final ArrayList<Componentes> unidades = new ArrayList<>();
     private int contadorAnimales = 0;
     private boolean hayGeneral = false;
@@ -56,11 +56,11 @@ public class Ejercito {
 
 
     public Ejercito() {
-        this.generalesDisponibles = new ArrayList<>();
-        inicializarGeneralesDisponibles();
         nombre = "";
         saldoPeso = 0;
         restablecerAtributos();
+        inicializarGeneralesDisponibles();
+        inicializarHeroesDisponibles();
         menu();
     }
 
@@ -98,7 +98,7 @@ public class Ejercito {
 
             char letra = 97; // Letra en código ASCII (a)
             for (String text : opciones) {
-                System.out.println((letra) + ". " + text);
+                System.out.println((letra) + "." + text);
                 letra++;
             }
             opcion = scanner.nextLine();
@@ -166,18 +166,18 @@ public class Ejercito {
                         try {
                             System.out.println("Elige un general para añadir al ejército:");
                             for (int i = 0; i < generalesDisponibles.size(); i++) {
-                                System.out.println((i + 1) + ". " + generalesDisponibles.get(i));
+                                System.out.println((i) + ". " + generalesDisponibles.get(i));
                             }
 
                             Scanner scanner1 = new Scanner(System.in);
                             int seleccion = scanner1.nextInt();
 
-                            if (seleccion >= 1 && seleccion <= generalesDisponibles.size()) {
-                                General generalSeleccionado = generalesDisponibles.remove(seleccion - 1); // Remover el general seleccionado de la lista
-
+                            if (seleccion >= 0 && seleccion <= generalesDisponibles.size()) {
+                                General generalSeleccionado = generalesDisponibles.get(seleccion);
                                 try {
                                     if (((saldoPeso + General.PESO_GENERAL) < MAX_PESO) && !hayGeneral) {
                                         adicionarUnidad(generalSeleccionado);
+                                        generalesDisponibles.remove(generalSeleccionado);
                                         imprimirInfo(unidades.getLast());
                                     } else {
                                         if (saldoPeso == MAX_PESO) {
@@ -189,7 +189,6 @@ public class Ejercito {
                                 } catch (MaxCapPesoEjercitoException | MaxCapGeneralException e) {
                                     System.out.println(e.getMessage());
                                 }
-
                             } else {
                                 System.out.println("Selección inválida.");
                             }
@@ -201,33 +200,26 @@ public class Ejercito {
 
 
                 case "e":
-                    try {
-                        if (contadorAnimales == 3) {
-                            System.out.println("Has alcanzado el máximo de animales");
-                        } else {
-                            Query consulta = HeroesyGenerales.query();
-                            consulta.constrain(Heroes.class);
-                            ObjectSet<Heroes> res = consulta.execute();
 
-                            List<Heroes> heroes = new ArrayList<>();
 
-                            while (res.hasNext()) {
-                                heroes.add(res.next());
-                            }
-
-                            System.out.println("Elige un héroe para añadir al ejército:");
+                    if (contadorAnimales == 3) {
+                        System.out.println("Has alcanzado el máximo de animales");
+                    } else {
+                        try {
+                            System.out.println("Elige un general para añadir al ejército:");
                             for (int i = 0; i < heroes.size(); i++) {
-                                System.out.println((i + 1) + ". " + heroes.get(i));
+                                System.out.println((i) + ". " + heroes.get(i));
                             }
 
                             Scanner scanner1 = new Scanner(System.in);
                             int seleccion = scanner1.nextInt();
 
-                            if (seleccion >= 1 && seleccion <= heroes.size()) {
-                                Heroes heroeSeleccionado = heroes.get(seleccion - 1);
+                            if (seleccion >= 0 && seleccion <= heroes.size()) {
+                                Heroes heroeSeleccionado = heroes.get(seleccion);
                                 try {
                                     if (((saldoPeso + Heroes.PESO_HEROE) < MAX_PESO) && contadorAnimales < MAX_ANIMALES) {
                                         adicionarUnidad(heroeSeleccionado);
+                                        heroes.remove(heroeSeleccionado);
                                         imprimirInfo(unidades.getLast());
                                     } else {
                                         if (saldoPeso == MAX_PESO) {
@@ -244,10 +236,13 @@ public class Ejercito {
                                 } catch (MaxAnimalesException e) {
                                     throw new RuntimeException(e);
                                 }
+                            } else {
+                                System.out.println("Opcion invalida");
                             }
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
                         }
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
+
                     }
                     break;
 
@@ -304,7 +299,7 @@ public class Ejercito {
                 case "i":
                     vergeneralganador();
                     break;
-                case "j" :
+                case "j":
                     cerrarConexion();
                     System.exit(1);
                     break;
@@ -425,14 +420,30 @@ public class Ejercito {
         return null;
     }
 
-    private void inicializarGeneralesDisponibles() {
-        // Realizar consulta a la base de datos para obtener los generales disponibles
-        Query consulta = HeroesyGenerales.query();
-        consulta.constrain(General.class);
-        ObjectSet<General> res = consulta.execute();
+    private void inicializarHeroesDisponibles() {
 
-        while (res.hasNext()) {
-            generalesDisponibles.add(res.next());
+        if (heroes.isEmpty()) {
+            Query consulta = HeroesyGenerales.query();
+            consulta.constrain(Heroes.class);
+            ObjectSet<Heroes> res = consulta.execute();
+
+
+            while (res.hasNext()) {
+                heroes.add(res.next());
+            }
+        }
+    }
+
+    private void inicializarGeneralesDisponibles() {
+
+        if (generalesDisponibles.isEmpty()) {
+            Query consulta = HeroesyGenerales.query();
+            consulta.constrain(General.class);
+            ObjectSet<General> res = consulta.execute();
+
+            while (res.hasNext()) {
+                generalesDisponibles.add(res.next());
+            }
         }
     }
 
